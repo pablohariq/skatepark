@@ -4,24 +4,23 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Administrador Skate Park</title>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
       integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="estilos.css" />
+    <link rel="stylesheet" href="/css/estilos.css" />
   </head>
   <body>
     <h1>Skate Park</h1>
 
     <div class="py-4">
-      <h2>Lista de participantes</h2>
+      <h2>Administración</h2>
+      <hr class="w-50" />
 
-      <hr />
-
-      <table class="table table-dark">
+      <table class="table w-50 m-auto">
         <thead>
           <tr>
             <th scope="col">#</th>
@@ -39,7 +38,7 @@
             <td>Tony Hawk</td>
             <td>12</td>
             <td>Kickflip</td>
-            <td class="text-success font-weight-bold">Aprobado</td>
+            <td><input type="checkbox" checked /></td>
           </tr>
           <tr>
             <th scope="row">2</th>
@@ -47,7 +46,7 @@
             <td>Evelien Bouilliart</td>
             <td>10</td>
             <td>Heelflip</td>
-            <td class="text-success font-weight-bold">Aprobado</td>
+            <td><input type="checkbox" checked /></td>
           </tr>
           <tr>
             <th scope="row">3</th>
@@ -55,12 +54,10 @@
             <td>Danny Way</td>
             <td>8</td>
             <td>Ollie</td>
-            <td class="text-warning font-weight-bold">En revisión</td>
+            <td><input type="checkbox" /></td>
           </tr>
         </tbody>
       </table>
-      <a href="#">Iniciar Sesión</a> |
-      <a href="#">Registrarme</a>
     </div>
   </body>
 </html>
