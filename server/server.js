@@ -3,6 +3,9 @@ const exphbs = require('express-handlebars')
 const expressFileUpload = require("express-fileupload")
 const { dirname } = require('path')
 const path = require('path')
+const {ingresarSkater} = require("../database/consultas")
+const {crearNombreArchivoUnico} = require("../utils/uniquename")
+
 
 const app = express()
 // **--------CONFIG--------**
@@ -13,8 +16,8 @@ app.engine("handlebars", exphbs({
     layoutsDir: path.join(raiz, "views")
 }))
 
-app.use("/css", express.static(path.join(raiz, "css")))
-app.use("/pics", express.static(path.join(raiz, "pics")))
+app.use("/css", express.static(path.join(raiz, "public", "css")))
+app.use("/pics", express.static(path.join(raiz, "public", "pics")))
 const config = {
     limits: {fileSize: 5000000},
     abortOnLimit: true,
@@ -39,11 +42,27 @@ app.get("/register", (req, res) => {
     res.render("Registro", {layout: "Registro"})
 })
 
-app.post("/register", (req, res) => {
+app.post("/register", async (req, res) => {
     const datosSkater = req.body
+    delete datosSkater.passwordconfirm
     const {fotoPerfil} = req.files
     const {name: nombreArchivo} = fotoPerfil
-    console.log(file)
-    res.end()
+
+    const nombreArchivoUnico = crearNombreArchivoUnico(nombreArchivo)
+    datosSkater.nombreArchivoFotoPerfil = nombreArchivoUnico
+    //guardar imagen en servidor
+    fotoPerfil.mv(path.join(raiz,"public","pics", nombreArchivoUnico), async (err) => {
+        if (err) res.send("Error en la carga de imagen")
+        try {
+            const ingreso = await ingresarSkater(datosSkater)
+            
+        } catch (error) {
+            console.log("Error en la consulta")
+            res.end()
+        }
+        
+    })
+    res.redirect("/")
+
 })
 module.exports = {app}
