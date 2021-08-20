@@ -33,35 +33,30 @@
           </tr>
         </thead>
         <tbody>
-          
+          {{#each skaters}}
+
           <tr>
-            <th scope="row">1</th>
-            <td><div></div></td>
-            <td>Tony Hawk</td>
-            <td>12</td>
-            <td>Kickflip</td>
+            <th scope="row">{{inc @index}}</th>
+            <td><div class="container m-auto"><img class="foto-perfil "src="/pics/{{this.foto}}" alt=""></div></td>
+            <td>{{this.nombre}}</td>
+            <td>{{this.anos_experiencia}}</td>
+            <td>{{this.especialidad}}</td>
+            {{#if this.estado}}
             <td class="text-success font-weight-bold">Aprobado</td>
-          </tr>
-          <tr>
-            <th scope="row">2</th>
-            <td><div></div></td>
-            <td>Evelien Bouilliart</td>
-            <td>10</td>
-            <td>Heelflip</td>
-            <td class="text-success font-weight-bold">Aprobado</td>
-          </tr>
-          <tr>
-            <th scope="row">3</th>
-            <td><div></div></td>
-            <td>Danny Way</td>
-            <td>8</td>
-            <td>Ollie</td>
+            {{else}}
             <td class="text-warning font-weight-bold">En revisión</td>
+            {{/if}}
           </tr>
+
+          {{/each}}
         </tbody>
       </table>
       <a href="/login">Iniciar Sesión</a> |
       <a href="/register">Registrarme</a>
     </div>
+
+<script>
+
+</script>
   </body>
 </html>

@@ -24,7 +24,7 @@
       <h2>Registro</h2>
       <hr class="w-50" />
 
-      <form action="submit" method="POST" enctype="multipart/form-data" >
+      <form>
         <div class="form-group row w-50 m-auto">
           <div class="form-group col-12 col-sm-6">
             <label>Email</label>
@@ -35,12 +35,15 @@
             <input name="nombre" class="form-control m-auto" value="Tony Hawk" />
           </div>
           <div class="form-group col-12 col-sm-6">
-            <label>Password</label>
-            <input name="password" type="password" class="form-control m-auto"  />
+            <label>Contraseña</label>
+            <input name="password" type="password" class="form-control m-auto" oninput="confirmarPassword()" required  />
           </div>
           <div class="form-group col-12 col-sm-6">
-            <label>Repita la password</label>
-            <input name="passwordconfirm" type="password" class="form-control m-auto" />
+            <label>Repita la contraseña</label>
+            <input name="passwordconfirm" type="password" class="form-control m-auto" oninput="confirmarPassword()" required />
+                  <div id="passwordFeedback" class="invalid-feedback">
+                    Las contraseñas ingresadas no coinciden
+                  </div>
           </div>
           <div class="form-group col-12 col-sm-6">
             <label>Años de experiencia</label>
@@ -61,25 +64,48 @@
     </div>
 
     <script>
+      const [passwordinput1, passwordinput2] = [...document.querySelectorAll("input")].slice(2,4)
+      const confirmarPassword = () => {
+        if (passwordinput1.value == passwordinput2.value){
+          document.querySelector("#passwordFeedback").classList.add("d-none")
+          passwordinput1.classList.add("is-valid")
+          passwordinput2.classList.add("is-valid")
+          passwordinput2.classList.remove("is-invalid")
+          return true
+        }
+        else{
+          document.querySelector("#passwordFeedback").classList.remove("d-none")
+          passwordinput2.classList.add("is-invalid")
+          return false
+        }
+      }
+
 
       const form = document.querySelector("form")
       form.addEventListener("submit", async (e) => {
         e.preventDefault()
-        const inputs = document.querySelectorAll("form input")
-        console.log(inputs)
-        const body = new FormData(form) //nota pedagógica: usar siempre un objeto FormData() para recoger los datos de un formulario que tiene archivo + payload
-
+        //const inputs = document.querySelectorAll("form input")
         //  fotoPerfil: inputs[6].files[0] 
-        // al enviar archivos mediante axios se debe usar FormData en vez de un objeto File
+        
+        const body = new FormData(form) //nota pedagógica: usar siempre un objeto FormData() para recoger los datos de un formulario que tiene archivo + payload
         console.log(body)
-        await axios.post("/register", 
-          body, 
-          {
-            Headers: {
-              'Content-type': 'multipart/form-data'
-            }
-          })
-        window.location.href = "/"
+        if (confirmarPassword()) {
+          try{
+            const registro = await axios.post("/register", 
+              body, 
+              {
+                Headers: {
+                  'Content-type': 'multipart/form-data'
+                }
+              })              
+            window.location.href = "/"
+          }catch(e){
+            alert("Algo salió mal", e)
+          }
+        }
+        else{
+          alert("Las contraseñas ingresadas no coinciden, intente nuevamente.")
+        }
 
         
       })
