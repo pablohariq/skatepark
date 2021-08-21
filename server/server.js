@@ -3,7 +3,7 @@ const exphbs = require('express-handlebars')
 const expressFileUpload = require("express-fileupload")
 const { dirname } = require('path')
 const path = require('path')
-const {ingresarSkater, obtenerSkaters, consultarDatosSkater} = require("../database/consultas")
+const {ingresarSkater, obtenerSkaters, consultarDatosSkater, actualizarDatosSkater} = require("../database/consultas")
 const {crearNombreArchivoUnico} = require("../utils/uniquename")
 const jwt = require('jsonwebtoken')
 const fs = require('fs')
@@ -25,6 +25,8 @@ app.engine("handlebars", exphbs({
 
 app.use("/css", express.static(path.join(raiz, "public", "css")))
 app.use("/pics", express.static(path.join(raiz, "public", "pics")))
+app.use("/sweetalert2", express.static(path.join(raiz, "node_modules", "sweetalert2", "dist")))
+
 const config = {
     limits: {fileSize: 5000000},
     abortOnLimit: true,
@@ -102,6 +104,12 @@ app.get("/datos", (req, res) => {
 
     })
 
+})
+
+app.post("/datos", async (req, res) => {
+    const datosSkater = req.body
+    const [datosPerfilActualizado] = await actualizarDatosSkater(datosSkater)
+    res.send(datosPerfilActualizado)
 })
 
 module.exports = {app}

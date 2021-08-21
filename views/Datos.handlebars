@@ -11,6 +11,10 @@
       integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
       crossorigin="anonymous"
     />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/sweetalert2/sweetalert2.all.min.js"></script>
+
+
     <link rel="stylesheet" href="/css/estilos.css" />
   </head>
   <body>
@@ -20,7 +24,7 @@
       <h2>Datos del perfil</h2>
       <hr class="w-50" />
 
-      <form>
+      <form method="POST">
         <div class="form-group row w-50 m-auto">
           <div class="form-group col-12 col-sm-6">
             <label>Email</label>
@@ -39,7 +43,9 @@
             <input
               type="password"
               class="form-control m-auto"
-              value="{{datosSkaterDecodificados.password}}"
+              value=""
+              oninput="confirmarPassword()"
+              required
             />
           </div>
           <div class="form-group col-12 col-sm-6">
@@ -48,7 +54,12 @@
               type="password"
               class="form-control m-auto"
               value=""
+              oninput="confirmarPassword()"
+              required
             />
+            <div id="passwordFeedback" class="invalid-feedback">
+          Las contraseñas ingresadas no coinciden
+           </div>
           </div>
           <div class="form-group col-12 col-sm-6">
             <label>Años de experiencia</label>
@@ -60,12 +71,61 @@
           </div>
         </div>
         <div class="mb-1">
-          <button class="btn btn-primary">Actualizar</button>
+          <button type="submit" class="btn btn-primary">Actualizar</button>
         </div>
         <div>
           <button class="btn btn-danger">Eliminar cuenta</button>
         </div>
       </form>
     </div>
+
+    <script>
+      const form = document.querySelector("form")
+      const inputs = [...document.querySelectorAll("input")]
+
+      const [passwordinput1, passwordinput2] = inputs.slice(2,4)
+      const confirmarPassword = () => {
+        if (passwordinput1.value == passwordinput2.value){
+          document.querySelector("#passwordFeedback").classList.add("d-none")
+          passwordinput1.classList.add("is-valid")
+          passwordinput2.classList.add("is-valid")
+          passwordinput2.classList.remove("is-invalid")
+          return true
+        }
+        else{
+          document.querySelector("#passwordFeedback").classList.remove("d-none")
+          passwordinput2.classList.add("is-invalid")
+          return false
+        }
+      }
+
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault()
+        if (confirmarPassword()){
+        const [email, nombre, password, passwordConfirm, anosExperiencia, especialidad] = inputs.map(i => i.value)
+        const body = {email, nombre, password, anosExperiencia, especialidad}
+        
+        const {data: datosSkaterActualizado} = await axios.post("/datos", body)
+        Swal.fire({
+          title: '¡Actualizado!',
+          text: `Los datos de ${datosSkaterActualizado.nombre} (${datosSkaterActualizado.email}) fueron actualizados exitosamente.`,
+          icon: 'success',
+          confirmButtonText: 'Volver a lista de participantes'
+        })
+        .then(() => window.location.href="/")
+
+        }
+        else{
+        Swal.fire({
+          title: 'Error',
+          text: `Las contraseñas ingresadas no coindicen, intente nuevamente.`,
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        })
+        }
+
+      })
+    </script>
   </body>
 </html>

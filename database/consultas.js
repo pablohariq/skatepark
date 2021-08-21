@@ -61,4 +61,16 @@ const consultarDatosSkater = async (credencialesSkater) => {
     if (datosSkater.length == 0) throw ({error: "Las credenciales no son válidas"})
     return datosSkater
 }
-module.exports = {ingresarSkater, obtenerSkaters, consultarDatosSkater}
+
+const actualizarDatosSkater = async (nuevosDatosSkater) => {
+    const valores = Object.values(nuevosDatosSkater)
+    const objConsulta = {
+        name: 'actualizar-datos',
+        text: `UPDATE skaters SET nombre = $2, password = $3, anos_experiencia = $4, especialidad = $5 WHERE email = $1 RETURNING nombre, email; `,
+        values: valores
+    }
+    const {rows: datosPerfilActualizado} = await realizarConsulta(objConsulta)
+    return datosPerfilActualizado
+}
+
+module.exports = {ingresarSkater, obtenerSkaters, consultarDatosSkater, actualizarDatosSkater}
