@@ -3,7 +3,7 @@ const exphbs = require('express-handlebars')
 const expressFileUpload = require("express-fileupload")
 const { dirname } = require('path')
 const path = require('path')
-const {ingresarSkater, obtenerSkaters, consultarDatosSkater, actualizarDatosSkater} = require("../database/consultas")
+const {ingresarSkater, obtenerSkaters, consultarDatosSkater, actualizarDatosSkater, eliminarCuenta} = require("../database/consultas")
 const {crearNombreArchivoUnico} = require("../utils/uniquename")
 const jwt = require('jsonwebtoken')
 const fs = require('fs')
@@ -18,6 +18,7 @@ const raiz = path.join(__dirname, "..")
 app.set("view engine", "handlebars")
 app.engine("handlebars", exphbs({
     layoutsDir: path.join(raiz, "views"),
+    partialsDir: path.join(raiz, "views", "partials"),
     helpers: {
         inc: function(index){return parseInt(index)+1}
     }
@@ -48,11 +49,25 @@ app.get("/login", (req, res) => {
     res.render("Login", {layout: "Login"})
 })
 
+app.post("/login", async (req, res) => {
+    const credencialesSkater = req.body
+    try {
+        const datosSkater = await consultarDatosSkater(credencialesSkater)
+        //si el usuario existe creamos el token
+        const token = jwt.sign({
+            data: datosSkater,
+            exp: Math.floor(Date.now()/1000) + 120
+        },clavePrivada)
+        res.status(200).send(token)
+        
+    } catch (error) {
+        res.status(500).send({error: "No se encontró el usuario en los registros"})
+    }
+})
+
 app.get("/register", (req, res) => {
     res.render("Registro", {layout: "Registro"})
 })
-
-
 
 app.post("/register", async (req, res) => {
     const datosSkater = req.body
@@ -76,23 +91,6 @@ app.post("/register", async (req, res) => {
 
 })
 
-app.post("/login", async (req, res) => {
-    const credencialesSkater = req.body
-    try {
-        const datosSkater = await consultarDatosSkater(credencialesSkater)
-        //si el usuario existe creamos el token
-        const token = jwt.sign({
-            data: datosSkater,
-            exp: Math.floor(Date.now()/1000) + 120
-        },clavePrivada)
-        res.status(200).send(token)
-        
-    } catch (error) {
-        res.status(500).send({error: "No se encontró el usuario en los registros"})
-    }
-
-
-})
 
 app.get("/datos", (req, res) => {
     const {t: token} = req.query
@@ -110,6 +108,20 @@ app.post("/datos", async (req, res) => {
     const datosSkater = req.body
     const [datosPerfilActualizado] = await actualizarDatosSkater(datosSkater)
     res.send(datosPerfilActualizado)
+})
+
+app.delete("/eliminarCuenta", (req, res) => {
+    const {t} = req.query
+    jwt.verify(t, clavePrivada, async (err, decoded) => {
+        const {email} = decoded.data[0]
+        await eliminarCuenta(email)
+        res.send(email)
+    })
+})
+
+app.get("/admin", async (req, res) => {
+    const skaters = await obtenerSkaters()
+    res.render("Admin", {layout: "Admin", skaters: skaters, admin: true})
 })
 
 module.exports = {app}

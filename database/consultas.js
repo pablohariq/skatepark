@@ -73,4 +73,14 @@ const actualizarDatosSkater = async (nuevosDatosSkater) => {
     return datosPerfilActualizado
 }
 
-module.exports = {ingresarSkater, obtenerSkaters, consultarDatosSkater, actualizarDatosSkater}
+const eliminarCuenta = async (email) => {
+    const objConsulta = {
+        name: 'eliminar-cuenta',
+        text: `DELETE FROM skaters WHERE email = $1 RETURNING *;`,
+        values: [email]
+    }
+    const {rows: cuentaEliminada} = await realizarConsulta(objConsulta)
+    return cuentaEliminada
+}
+
+module.exports = {ingresarSkater, obtenerSkaters, consultarDatosSkater, actualizarDatosSkater, eliminarCuenta}

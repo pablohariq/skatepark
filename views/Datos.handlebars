@@ -74,10 +74,25 @@
           <button type="submit" class="btn btn-primary">Actualizar</button>
         </div>
         <div>
-          <button class="btn btn-danger">Eliminar cuenta</button>
+          <button onclick="solicitarEliminacion()" class="btn btn-danger">Eliminar cuenta</button>
         </div>
       </form>
     </div>
+
+  <template id="modal-eliminar">
+  <swal-title>
+    Esta acción eliminará permanentemente su cuenta de la base de datos. ¿Desea continuar?
+  </swal-title>
+  <swal-icon type="warning" color="red"></swal-icon>
+  <swal-button type="confirm">
+    Eliminar
+  </swal-button>
+  <swal-button type="deny">
+    Cancelar
+  </swal-button>
+
+  <swal-param name="allowEscapeKey" value="false" />
+</template>
 
     <script>
       const form = document.querySelector("form")
@@ -126,6 +141,27 @@
         }
 
       })
+
+      const solicitarEliminacion = () => {
+        Swal.fire({
+          template: '#modal-eliminar',
+          confirmButtonColor: "#dc3545",
+          denyButtonColor: "#6c757d",
+          toast: true,
+          preConfirm: async () => {
+            const token = sessionStorage.getItem("token")
+            const emailEliminado = await axios.delete(`/eliminarCuenta?t=${token}`)
+            window.location.href = "/"
+            Swal.fire({
+              toast: true,
+              position: "top-end",
+              timer: 3000,
+              timerProgressBar: true,
+              title: `Cuenta ${emailEliminado} eliminada exitosamente.`
+            })
+          }
+        })
+      }
     </script>
   </body>
 </html>
