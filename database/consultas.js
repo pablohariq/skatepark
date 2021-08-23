@@ -76,11 +76,22 @@ const actualizarDatosSkater = async (nuevosDatosSkater) => {
 const eliminarCuenta = async (email) => {
     const objConsulta = {
         name: 'eliminar-cuenta',
-        text: `DELETE FROM skaters WHERE email = $1 RETURNING *;`,
+        text: `DELETE FROM skaters WHERE email = $1 RETURNING email, foto;`,
         values: [email]
     }
     const {rows: cuentaEliminada} = await realizarConsulta(objConsulta)
     return cuentaEliminada
 }
 
-module.exports = {ingresarSkater, obtenerSkaters, consultarDatosSkater, actualizarDatosSkater, eliminarCuenta}
+const confirmarParticipacion = async (email, estaConfirmado) => {
+    const objConsulta = {
+        name: 'confirmar-participacion',
+        text: `UPDATE skaters SET estado = $1 WHERE email = $2 RETURNING nombre, estado;`,
+        values: [estaConfirmado, email]
+    }
+    const {rows: skaterConfirmado} = await realizarConsulta(objConsulta)
+    return skaterConfirmado
+
+}
+
+module.exports = {ingresarSkater, obtenerSkaters, consultarDatosSkater, actualizarDatosSkater, eliminarCuenta, confirmarParticipacion}

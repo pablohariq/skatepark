@@ -3,7 +3,7 @@ const exphbs = require('express-handlebars')
 const expressFileUpload = require("express-fileupload")
 const { dirname } = require('path')
 const path = require('path')
-const {ingresarSkater, obtenerSkaters, consultarDatosSkater, actualizarDatosSkater, eliminarCuenta} = require("../database/consultas")
+const {ingresarSkater, obtenerSkaters, consultarDatosSkater, actualizarDatosSkater, eliminarCuenta, confirmarParticipacion} = require("../database/consultas")
 const {crearNombreArchivoUnico} = require("../utils/uniquename")
 const jwt = require('jsonwebtoken')
 const fs = require('fs')
@@ -84,7 +84,7 @@ app.post("/register", async (req, res) => {
             res.redirect("/")
             
         } catch (error) {
-           throw({error: "Error en la consulta"})
+           res.status(500).send({error: "Error en la consulta"})
         }
         
     })
@@ -113,15 +113,29 @@ app.post("/datos", async (req, res) => {
 app.delete("/eliminarCuenta", (req, res) => {
     const {t} = req.query
     jwt.verify(t, clavePrivada, async (err, decoded) => {
+        if (err) throw("Error en la consulta")
         const {email} = decoded.data[0]
-        await eliminarCuenta(email)
-        res.send(email)
+        const [cuentaEliminada] = await eliminarCuenta(email)
+        const {foto} = cuentaEliminada
+        fs.unlinkSync(path.join(raiz,"public","pics",foto))
+        res.status(200).send(email)
     })
 })
 
 app.get("/admin", async (req, res) => {
     const skaters = await obtenerSkaters()
     res.render("Admin", {layout: "Admin", skaters: skaters, admin: true})
+})
+
+app.post("/confirmar", async (req, res) => {
+    const {email, estaConfirmado} = req.body
+    try {
+        const skaterConfirmado = await confirmarParticipacion(email, estaConfirmado)
+        res.status(200).send(skaterConfirmado)
+    } catch (error) {
+        res.status(500).send(error)
+    }
+    
 })
 
 module.exports = {app}

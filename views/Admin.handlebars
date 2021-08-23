@@ -12,6 +12,8 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="/css/estilos.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/sweetalert2/sweetalert2.all.min.js"></script>
   </head>
   <body>
     <h1>Skate Park</h1>
@@ -24,8 +26,31 @@
 
     </div>
 <script>
-  const actualizarParticipacion = (email) => {
-    alert(email)
+  const actualizarParticipacion = async function (checkbox){
+    const email = checkbox.getAttribute("data-email")
+    const estaConfirmado = checkbox.checked
+    const skaterConfirmado = axios.post("/confirmar", {email, estaConfirmado})
+    
+    skaterConfirmado
+    .then((resolve) => {      
+      const {nombre, estado} = resolve.data[0]
+      console.log(resolve.data)
+      const mensajeToastConfirmacion = (estado)
+      ?  `Skater ${nombre} confirmado para la competencia.`
+      :  `Skater ${nombre} pasa a revisión.`
+      Swal
+      .fire({
+        toast: true,
+        position: "top-end",
+        timer: 3000,
+        timerProgressBar: true,
+        title: mensajeToastConfirmacion
+      })
+      .finally(() => {
+        location.reload()
+      })
+      
+    })
 
   }
 </script>

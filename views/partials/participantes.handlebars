@@ -31,10 +31,17 @@
 
             {{#if ../admin}}
             <td>
+                {{#if this.estado}}
                 <div class="custom-control custom-switch">
-                <input type="checkbox" class="custom-control-input" onchange="actualizarParticipacion("{{this.email}}")">
+                <input type="checkbox" class="form-check-input" data-email={{this.email}} onchange="actualizarParticipacion(this)" checked>
                 </div>
-           </td>
+                {{else}}
+                <div class="custom-control custom-switch">
+                <input type="checkbox" class="form-check-input" data-email={{this.email}} onchange="actualizarParticipacion(this)">
+                </div>
+                {{/if}}
+           </td> 
+
             {{/if}}
           </tr>
 

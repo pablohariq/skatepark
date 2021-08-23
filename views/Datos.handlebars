@@ -74,7 +74,7 @@
           <button type="submit" class="btn btn-primary">Actualizar</button>
         </div>
         <div>
-          <button onclick="solicitarEliminacion()" class="btn btn-danger">Eliminar cuenta</button>
+          <button type="button" onclick="solicitarEliminacion()" class="btn btn-danger">Eliminar cuenta</button>
         </div>
       </form>
     </div>
@@ -150,14 +150,19 @@
           toast: true,
           preConfirm: async () => {
             const token = sessionStorage.getItem("token")
-            const emailEliminado = await axios.delete(`/eliminarCuenta?t=${token}`)
-            window.location.href = "/"
-            Swal.fire({
+            const response = await axios.delete(`/eliminarCuenta?t=${token}`)
+            console.log(response)
+            const email = response.data
+            Swal
+            .fire({
               toast: true,
               position: "top-end",
               timer: 3000,
               timerProgressBar: true,
-              title: `Cuenta ${emailEliminado} eliminada exitosamente.`
+              title: `Cuenta ${email} eliminada exitosamente.`
+            })
+            .then(() => {
+              window.location.href = "/"
             })
           }
         })
